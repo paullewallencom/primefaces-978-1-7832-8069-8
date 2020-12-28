@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/masterLayout.xhtml">
+
+	<ui:define name="head">
+		<style type="text/css">
+			.postsPanel {
+				width: 75%;
+			}
+
+		</style>
+	
+	</ui:define>
+	<ui:define name="bodyContent">
+	
+		<h:form id="form">
+		<p:growl autoUpdate="true"/>
+		<h:panelGrid columns="2" styleClass="table-align-top" columnClasses="postsPanel">
+			
+			<p:dataList value="#{homeController.postViews}" var="postView" id="posts" paginator="true" rows="5" type="none" emptyMessage="No Posts">  
+	            <h:outputText value="#{postView.post.title}" style="margin-left:0px; font-size:7; font-weight:bold" /><br />
+	            <h:outputText value="#{postView.post.description}" escape="false" style="margin-left:0px" /><br />
+	            <h:outputText value="Tags: #{postView.post.tagsAsString}" style="margin-left:0px" /><br />
+	            <p:rating value="#{postView.rating.rate}" readonly="true"></p:rating><br />
+	            <p:commandButton value="more..." 
+	            			actionListener="#{homeController.setSelectedPostView(postView)}" 
+	            			update=":form:postViewDetails"
+	            			oncomplete="postDlg.show()">
+	            </p:commandButton>
+	            <br /><br />
+	            <p:separator/>
+		    </p:dataList>
+		    
+		    <p:panel header="Live Updates">
+		    	<p:tagCloud model="#{homeController.model}">  
+			        <p:ajax event="select" update="posts" listener="#{homeController.onSelect}" />  
+			    </p:tagCloud>
+		    </p:panel>
+		    
+		    <p:dialog widgetVar="postDlg" header="Post Detail">
+		    	<h:panelGrid id="postViewDetails" columns="1"  style="width: 500px;">
+			    	<h:outputLabel value="#{homeController.selectedPostView.post.title}" />
+		    		<h:outputText value="#{homeController.selectedPostView.post.description}" escape="false"/>
+		    		<p:rating  value="#{homeController.selectedPostView.rating.rate}" 
+		    				readonly="#{homeController.selectedPostView.alreadyRated}">
+		    			<p:ajax event="rate" listener="#{homeController.handlePostRating}" />  
+		    		</p:rating>
+		    		
+		    	</h:panelGrid>
+		    </p:dialog>
+      </h:panelGrid>    
+      </h:form>              
+	</ui:define>
+</ui:composition>
